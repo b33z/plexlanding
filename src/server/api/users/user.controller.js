@@ -1,28 +1,27 @@
-import Database from '../../database';
+import User from './user.model';
 import logger from '../../logger';
 
-const models = Database.models;
 const log = logger.create('User:Ctrl');
 
 export async function all(ctx) {
-  const users = await models.User.findAll();
+  const users = await new User().find();
   ctx.body = { users };
 }
 
 export async function create(ctx) {
-  const user = ctx.request.body;
   // TODO talk to plex api
   try {
-    const created = await models.User.create(user);
+    const user = new User(ctx.request.body);
     log.verbose(`Creating new user [${user.email}]`);
-    ctx.body = { user: created.get() };
+    await user.save();
+    ctx.body = { user: user.values() };
   } catch (err) {
     ctx.throw(422, err);
   }
 }
 
 export async function getUser(ctx, next) {
-  const user = await models.User.findById(ctx.params.id);
+  const user = await new User().findById(ctx.params.id);
   if (!user) {
     ctx.throw(404, `User ${ctx.params.id} could not be found`);
   }
@@ -36,15 +35,14 @@ export async function getUser(ctx, next) {
 export async function update(ctx) {
   const user = ctx.body.user;
 
-  Object.assign(user, ctx.request.body);
-  await user.save();
+  await user.save(ctx.request.body);
 
-  ctx.body = { user };
+  ctx.body = { user: user.values() };
 }
 
 export async function destroy(ctx) {
   const user = ctx.body.user;
-  log.info(`Deleting user with id of ${user.id}`);
+  log.info(`Deleting user with id of ${user._id}`);
 
   await user.destroy();
 

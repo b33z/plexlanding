@@ -59,18 +59,9 @@ export async function start(config) {
 
   // Register all server components
   log.info('Initializing server components').debug('Using config', config);
-  await database.init(config);
+  database.init(join(config.paths.data, config.database.filename));
   routes.register(app, config);
   sockets.register(app);
-
-  app.on('error', (err, ctx) => {
-    if (ctx.status >= 500) {
-      log.error(`Encountered an error for [${ctx.request.method}@${ctx.request.url}]`);
-      if (err.stack) {
-        log.error(err.stack);
-      }
-    }
-  });
 
   app.listen(config.port, (err) => {
     if (err) {

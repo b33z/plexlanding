@@ -1,34 +1,32 @@
-import Sequelize from 'sequelize';
+import { keys, pick } from 'lodash';
 
-import { safelyParseJSON, ensureHttpProtocol } from '../../utils/misc';
+import { Model } from '../../database';
 
 // TODO
 // Have a flag for requested, approved/rejected, invite pending, and accepted.
 
-export const User = {
-  name: 'users',
-  schema: {
-    email: {
-      type: Sequelize.STRING,
-      unique: true,
-      allowNull: false,
+const schema = {
+  fields: {
+    email: '',
+    username: '',
+    comment: '',
+    status: {
+      requested: false,
+      approved: false,
+      rejected: false,
+      pending: false,
+      friend: false
     },
-    username: {
-      type: Sequelize.STRING,
-      unique: true
-    },
-    comment: {
-      type: Sequelize.TEXT
-    },
-    isExisting: {
-      type: Sequelize.BOOLEAN,
-      default: false
-    },
-    approved: {
-      type: Sequelize.BOOLEAN,
-      default: false
-    }
+    required: ['email']
   }
 };
+
+export class User extends Model {
+  constructor(values = {}) {
+    super('User', schema, { secure: true });
+    Object.assign(this, values);
+  }
+}
+
 
 export default User;

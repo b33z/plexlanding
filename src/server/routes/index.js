@@ -32,6 +32,15 @@ function register(app, config) {
   });
 
   app.use(router.routes()).use(router.allowedMethods());
+
+  app.on('error', (err, ctx) => {
+    if (ctx.status >= 500) {
+      log.error(`Encountered an error for [${ctx.request.method}@${ctx.request.url}]`);
+      if (err.stack) {
+        log.error(err.stack);
+      }
+    }
+  });
 }
 
 export default { register };

@@ -20,14 +20,8 @@ export default {
   },
 
   database: {
-    config: {
-      autoload: true,
-      filename: join(dataDir, 'config.db'),
-    },
-    data: {
-      autoload: true,
-      filename: join(dataDir, 'data.db'),
-    }
+    force: false,
+    filename: 'database.db'
   },
 
   secureApi: false,
